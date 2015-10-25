@@ -1,5 +1,5 @@
 # nats-messaging-for-flink ![build status](https://travis-ci.org/mring33621/nats-messaging-for-flink.svg?branch=master)
-A pair of [NATS Messaging](http://nats.io/) SourceFunction<String> and SinkFunction<String> for [Apache Flink](http://flink.apache.org/) Streaming.
+[NATS Messaging](http://nats.io/) SourceFunctions and SinkFunctions for [Apache Flink](http://flink.apache.org/) Streaming.
 
 Version 0.4.1
 
