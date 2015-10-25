@@ -14,26 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.mattring.flink.nats;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  *
  * @author Matthew Ring
  */
 public class NatsConfig implements Serializable {
-    
-    private static final long serialVersionUID = 1L;
-    
+
+    private static final long serialVersionUID = 2L;
+
     private final String brokerUris;
     private final String topic;
     private final int maxConnectRetries;
     private final int reconnectWaitMillis;
 
     public NatsConfig(String brokerUris, String topic, int maxConnectRetries, int reconnectWaitMillis) {
+        checkArgument(
+                !Strings.isNullOrEmpty(brokerUris),
+                "brokerUris must be populated");
+        checkArgument(
+                maxConnectRetries >= -1,
+                "maxConnectRetries must be zero or larger (num retries), or -1 (infinite retries)");
+        checkArgument(
+                reconnectWaitMillis >= 0,
+                "reconnectWaitMillis must be zero or positive");
         this.brokerUris = brokerUris;
         this.topic = topic;
         this.maxConnectRetries = maxConnectRetries;
@@ -54,6 +65,14 @@ public class NatsConfig implements Serializable {
 
     public int getReconnectWaitMillis() {
         return reconnectWaitMillis;
+    }
+
+    public Properties getAsJava_NatsProperties() {
+        final Properties natsProps = new Properties();
+        natsProps.put("uri", this.getBrokerUris());
+        natsProps.put("max_reconnect_attempts", this.getMaxConnectRetries());
+        natsProps.put("reconnect_time_wait", this.getReconnectWaitMillis());
+        return natsProps;
     }
 
     @Override
@@ -94,6 +113,5 @@ public class NatsConfig implements Serializable {
     public String toString() {
         return "NatsConfig{" + "brokerUris=" + brokerUris + ", topic=" + topic + ", maxConnectRetries=" + maxConnectRetries + ", reconnectWaitMillis=" + reconnectWaitMillis + '}';
     }
-    
-    
+
 }

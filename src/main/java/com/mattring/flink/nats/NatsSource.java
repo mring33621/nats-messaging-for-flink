@@ -17,7 +17,6 @@
 package com.mattring.flink.nats;
 
 
-import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import java.util.Properties;
@@ -36,36 +35,16 @@ import org.slf4j.LoggerFactory;
  */
 public class NatsSource implements SourceFunction<String> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private static final Logger LOG = LoggerFactory.getLogger(NatsSource.class);
-
-    /**
-     * Default delay between successive connection attempts
-     */
-    private static final int DEFAULT_CONNECTION_RETRY_SLEEP = 500;
-
-    /**
-     * Default connection timeout when connecting to the server socket
-     * (infinite)
-     */
-    private static final int CONNECTION_TIMEOUT_TIME = 5000;
 
     private final NatsConfig natsConfig;
     private final String delimiter;
 
-    private volatile boolean isRunning = true;
+    private volatile boolean isRunning;
 
-    public NatsSource(NatsConfig natsConfig, String optionalDelimiter) {
-        checkArgument(
-                !Strings.isNullOrEmpty(natsConfig.getBrokerUris()),
-                "brokerUris must be populated");
-        checkArgument(
-                natsConfig.getMaxConnectRetries() >= -1,
-                "maxConnectRetries must be zero or larger (num retries), or -1 (infinite retries)");
-        checkArgument(
-                natsConfig.getReconnectWaitMillis() >= 0,
-                "reconnectWaitMillis must be zero or positive");
+    public NatsSource(NatsConfig natsConfig, String optionalDelimiter) {        
         this.natsConfig = natsConfig;
         this.delimiter = Strings.emptyToNull(optionalDelimiter);
         this.isRunning = false;
@@ -80,10 +59,7 @@ public class NatsSource implements SourceFunction<String> {
             
             LOG.info("Running NatsSource with " + natsConfig);
 
-            final Properties natsProps = new Properties();
-            natsProps.put("uri", natsConfig.getBrokerUris());
-            natsProps.put("max_reconnect_attempts", natsConfig.getMaxConnectRetries());
-            natsProps.put("reconnect_time_wait", natsConfig.getReconnectWaitMillis());
+            final Properties natsProps = natsConfig.getAsJava_NatsProperties();
 
             try (Connection natsConn = Connection.connect(natsProps)) {
 
