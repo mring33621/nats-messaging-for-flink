@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NatsSource implements SourceFunction<String> {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     private static final Logger LOG = LoggerFactory.getLogger(NatsSource.class);
 
